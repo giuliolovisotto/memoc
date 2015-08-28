@@ -1,0 +1,177 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Arsclassica Article
+% LaTeX Template
+% Version 1.1 (10/6/14)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Lorenzo Pantieri (http://www.lorenzopantieri.net) with extensive modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[
+12pt, % Main document font size
+a4paper, % Paper type, use 'letterpaper' for US Letter paper
+oneside, % One page layout (no page indentation)
+%twoside, % Two page layout (page indentation for binding and different headers)
+headinclude,footinclude, % Extra spacing for the header and footer
+BCOR5mm, % Binding correction
+]{scrartcl}
+
+\input{structure.tex} % Include the structure.tex file which specified the document structure and layout
+
+\usepackage{geometry}
+\usepackage{float}
+
+\hyphenation{Fortran hy-phen-ation e-ser-ci-ta-zio-ne} % Specify custom hyphenation points in words with dashes where you would like hyphenation to occur, or alternatively, don't put any dashes in a word to stop hyphenation altogether
+
+%----------------------------------------------------------------------------------------
+%	TITLE AND AUTHOR(S)
+%----------------------------------------------------------------------------------------
+
+\title{\normalfont\spacedallcaps{Relazione MEMOC}} % The article title
+
+\author{\spacedlowsmallcaps{Giulio Lovisotto - 1084847} \\ \normalsize{\spacedallcaps{Universita' degli studi di Padova}}} % The article author(s) - author affiliations need to be specified in the AUTHOR AFFILIATIONS block
+
+\date{16 Settembre 2015} % An optional date to appear under the author(s)
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	HEADERS
+%----------------------------------------------------------------------------------------
+
+\renewcommand{\sectionmark}[1]{\markright{\spacedlowsmallcaps{#1}}} % The header for all pages (oneside) or for even pages (twoside)
+%\renewcommand{\subsectionmark}[1]{\markright{\thesubsection~#1}} % Uncomment when using the twoside option - this modifies the header on odd pages
+\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}\rightmark\hfil}} % The header style
+
+\pagestyle{scrheadings} % Enable the headers specified in this block
+
+%----------------------------------------------------------------------------------------
+%	TABLE OF CONTENTS & LISTS OF FIGURES AND TABLES
+%----------------------------------------------------------------------------------------
+
+\maketitle % Print the title/author/date block
+
+\setcounter{tocdepth}{2} % Set the depth of the table of contents to show sections and subsections only
+
+%\tableofcontents % Print the table of contents
+
+%\listoffigures % Print the list of figures
+
+%\listoftables % Print the list of tables
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+%\section*{Abstract} % This section will not appear in the table of contents due to the star (\section*)
+
+% \lipsum[1] % Dummy text
+
+%----------------------------------------------------------------------------------------
+%	AUTHOR AFFILIATIONS
+%----------------------------------------------------------------------------------------
+
+%{\let\thefootnote\relax\footnotetext{* \textit{Department of Biology, University of Examples, London, United Kingdom}}}
+
+%{\let\thefootnote\relax\footnotetext{\textsuperscript{1} \textit{Department of Chemistry, University of Examples, London, United Kingdom}}}
+
+%----------------------------------------------------------------------------------------
+
+%\newpage % Start the article content on the second page, remove this if you have a longer abstract that goes onto the second page
+
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+
+\section{Introduzione}
+
+Questo documento descrive le metodologie e le strutture sviluppate per l'esercitazione del corso di Metodi e Modelli per l'Ottimizzazione combinatoria, anno accademico 14/15. L'esercitazione consiste nella risoluzione del  Traveling Salesman Problem (TSP) con l'uso di metodi di ottimizzazione. E' stato implementato il modello per il risolutore esatto \textsc{cplex}, e una metaeuristica di tipo particle swarm optimization \textsc{pso}. Il seguente documento e' strutturato come segue: in Sezione~\ref{sec:cplex} viene descritto il modello in \textsc{cplex} (relativo alla Parte 1), in Sezione~\ref{sec:eur} vengono descritte le euristiche utilizzate (relative allla Parte 2), in Sezione~\ref{sec:exp} vengono descritti i dataset e la metodologia usata per l'esperimento, nonche' presentati i risultati. Il documento termina con alcune conclusioni in Sezione~\ref{sec:conclusioni}.
+
+\subsection{FILES CONSEGNATI}
+
+\begin{itemize}
+\item something;
+\item something else.
+\end{itemize}
+
+\section{Modello CPLEX} \label{sec:cplex}
+
+In questa sezione viene descritto in che modo e' stato realizzato il modello per TSP che viene usato per la risoluzione con \textsc{cplex}. Per realizzare tale modello e' stata utilizzata la formalizzazione del TSP fornita dal docente~\cite{luigitraccia1}. Tale formalizzazione modella il problema come un problema di ottimizzazione su reti di flusso. E' stato realizzato un unico file \texttt{cplex.cpp}. Esso procede secondo i seguenti passi:
+\begin{enumerate}
+ \item legge il problema in input, che consiste in un file di testo riportante la matrice contenente i costi degli archi del grafo (separati da virgole), e inizializza le variabili del problema e la funzione obiettivo, impostando i vincoli di tipo e i bounds per ciascuna variabile;
+ \item per ogni vincolo, lo crea e lo aggiunge alla matrice dei coefficienti dell'istanza del problema. Le variabili relative ai cappi (cioe' $x_{ii}, y_{ii}$) vengono rimosse;
+ \item esegue l'ottimizzazione e salva i risultati su file, tra i quali tempo di esecuzione, path ottimo, soluzione ottima trovata.
+\end{enumerate}
+
+%----------------------------------------------------------------------------------------
+%	RESULTS AND DISCUSSION
+%----------------------------------------------------------------------------------------
+
+\section{Metaeuristiche} \label{sec:eur}
+In questa sezione vengono descritte le metaeuristiche implementate per la risoluzione di TSP. 
+
+\subsection{Particle Swarm Optimization}
+
+PSO e' una metaeuristica basata su popolazione. In esso, gli individui $x_i$ (possibili soluzioni) si muovono nello spazio N-dimensionale secondo le loro rispettive velocita' $v_i$. In PSO gli individui ricordano la miglior posizione da loro visitata, e la miglior posizione globale visitata. Tali posizioni influiscono sulla velocita' dell'iterazione successiva. Per applicare tale metodo a TSP e' necessario renderlo discreto. E' stata scelta la rappresentazione proposta in~\cite{1259748} e ripresa in~\cite{shi2007particle}, dove gli individui sono cicli sul grafo, e le velocita' sono sequenze di ``Swap Operator''. Uno Swap Operator e' definito da una coppia $(i, j)$, la sua applicazione su un ciclo $x_k$ ha l'effetto di scambiare la componente $i$-esima con la componente $j$-esima. 
+
+%La regola di update delle velocita' e' la seguente:
+
+%\[ v_{i+1} = v_i \otimes \alpha \ast (p_i - x_i) \otimes \beta \ast (g - x_i) \quad \alpha, \beta \in [0, 1].\]
+
+%Alla fine dell'iterazione $i$-esima, la l'individuo $k$ si trova in posizione $x_k = x_{0} + v_{i}$
+
+E' stato realizzato un singolo file \texttt{pso.cpp}. Il file legge il problema in input (nel formato riportato in Sezione~\ref{sec:cplex}. La popolazione e' inizializzata con individui random (cicli sul grafo), le velocita' iniziali sono sequenze di Swap Operators di lunghezza random tra 0 ed $N$ (numero di nodi). Gli elementi su cui effettuare swap sono scelti in maniera random. Viene eseguita l'ottimizzazione e vengono salvati i risultati su file.
+I parametri usati per l'algoritmo sono rispettivamente: numero di iterazioni $K = 100$, dimensione della popolazione $ps = 20000$, e probabilita' $\alpha, \beta = 0.5$.
+
+Qui devi per forza scrivere in forma piu estesa come funziona.
+
+\section{Esperimenti}\label{sec:exp}
+In questa sezione vengono riportate le tecniche utilizzate per generare i dataset, le metodologie usate per gli esperimenti, e i risultati ottenuti.
+
+\subsection{Dataset}
+I dataset consistono in insiemi di $n$ punti, $n \in \{9, 16, 25, 36, 49, 64\}$, distribuiti un quadrato bidimensionale con lato di dimensione 1. Sono stati usati 3 diversi criteri per la disposizione dei punti:
+\begin{itemize}
+	\item \textbf{random} i punti sono scelte in maniera casuale;
+	\item \textbf{uniform} i punti sono disposti a formare una griglia;
+	\item \textbf{clustered} .
+\end{itemize}
+Per i dataset con criterio \textbf{random} e \textbf{clustered} vengono generate 20 istanze per ogni dimensione.
+
+\subsection{Metodologia}
+Io scriverei qui i parametri utilizzati per l'algoritmo.
+Mia idea e'. Per ogni istanza fai andare 5 times cplex. Salva tempo, best, path.
+Poi fai andare 5 times pso. Salva tempo, best, path. 
+Plotto tempo avg per growing sizes. Best avg per growing sizes. Error avg per growing sizes.
+
+\subsection{Risultati}
+plotsplotsplots
+
+\section{Conclusioni}\label{sec:conclusioni}
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\renewcommand{\refname}{\spacedlowsmallcaps{References}} % For modifying the bibliography heading
+
+\bibliographystyle{unsrt}
+
+\bibliography{bibliography.bib} % The file containing the bibliography
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
