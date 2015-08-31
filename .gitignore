@@ -1,5 +1,5 @@
 data/datasets/.directory
-
+*.directory
 *.aux
 *.glo
 *.idx
