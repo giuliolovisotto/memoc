@@ -45,9 +45,9 @@ for d in datasets:
         os.remove("results.csv")
     np.savetxt("results/%s/%s" % ('pso', d), res[:, :2].mean(axis=0))
     print "pso: %s, %s" % (res[:, :2].mean(axis=0)[0], res[:, :2].mean(axis=0)[1])
-    
-    
-    
-    
+
+
+
+
 
 
