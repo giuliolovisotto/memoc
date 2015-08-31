@@ -141,7 +141,7 @@ La regola di aggiornamento delle velocita' per il generico individuo $k$ all'ite
 
 dove $p_k^{(i)}$ e' la miglior soluzione visitata dall'individuo $k$, e $g^{(i)}$ e' la miglior soluzione visitata dalla popolazione, finora. Alla fine dell'iterazione $i$-esima l'individuo $x_k$ si trova in posizione $x_k + v_k^{(i)}$. Ad ogni iterazione ogni individuo viene valutato e le miglior soluzioni visitate vengono aggiornate.
 
-E' stato realizzato un singolo file \texttt{pso.cpp}. Il file legge il problema in input (nel formato riportato in Sezione~\ref{sec:cplex}). La popolazione e' inizializzata con individui random, le velocita' iniziali sono sequenze di SO di lunghezza random tra 0 ed $N$ (numero di nodi). Gli elementi su cui effettuare swap sono scelti in maniera random. Viene eseguita l'ottimizzazione e vengono salvati i risultati su file.
+E' stato realizzato un singolo file \texttt{pso.cpp}. Gli individui sono rappresentati da array di interi (\texttt{vector<int>}), dove ogni elemento fa riferimento ad un nodo del problema. Gli SO sono coppie di interi, le velocita' (sequenze di SO) sono array di coppie di interi (\texttt{vector<pair<int, int> >}). Gli operatori introdotti precedentemente in questo paragrafo sono realizzati tramite funzioni. Il file legge il problema in input (nel formato riportato in Sezione~\ref{sec:cplex}). La popolazione e' inizializzata con individui random, le velocita' iniziali sono sequenze di SO di lunghezza random tra 0 ed $N$ (numero di nodi). Gli elementi su cui effettuare swap sono scelti in maniera random. Viene eseguita l'ottimizzazione e vengono salvati i risultati su file.
 
 \section{Esperimenti}\label{sec:exp}
 In questa sezione vengono riportate le tecniche utilizzate per generare i dataset, le metodologie usate per gli esperimenti, e i risultati ottenuti.
@@ -157,11 +157,11 @@ Per i dataset con criterio \textbf{random} e \textbf{clustered} vengono generate
 
 \subsection{Metodologia e Parametri}
 
-Gli esperimenti sono stati svolti su macchine cosicosi. Essi consistono nell'utilizzare le tecniche descritte in Sezione \ref{sec:cplex} e \ref{sec:eur} per risolvere il TSP, sui dataset generati. Per ogni dataset, ogni risolutore viene eseguito 5 volte, e vengono salvati le medie e le standard deviation del tempo di esecuzione e dei costi delle soluzioni ottime trovate. 
+Gli esperimenti sono stati svolti su macchine cosicosi. Essi consistono nell'utilizzare le tecniche descritte in Sezione \ref{sec:cplex} e \ref{sec:eur} per risolvere il TSP, sui dataset generati. Per ogni dataset, ogni risolutore viene eseguito 5 volte, e vengono salvati le medie e le standard deviation dei tempi di esecuzione e dei costi delle soluzioni ottime trovate. 
 
-Per \textsc{pso} e' stata utilizzata una popolazione di 20.000 individui, 100 iterazioni, $\alpha = 0.75$, $\beta=0.1$ (i parametri sono stati scelti empiricamente, senza un estensivo procedimento di ottimizzazione).
+Per \textsc{pso} e' stata utilizzata una popolazione di 2.000 individui, 1.000 iterazioni, $\alpha = 0.75$, $\beta=0.1$ (i parametri sono stati scelti empiricamente, senza un estensivo procedimento di ottimizzazione).
 
-Potrebbe essere interessante vedere in percentuale quanti degli archi usati da pso sono parte dell'ottimo
+Potrebbe essere interessante vedere in percentuale quanti degli archi usati da pso sono parte dell'ottimo. Interessante vedere fevals durante pso.
 
 \subsection{Risultati}
 plotsplotsplots
