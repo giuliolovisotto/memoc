@@ -151,21 +151,34 @@ I dataset consistono in insiemi di $n$ punti, $n \in \{9, 16, 25, 36, 49, 64\}$,
 \begin{itemize}
 	\item \textbf{random} i punti sono scelte in maniera casuale;
 	\item \textbf{uniform} i punti sono disposti a formare una griglia;
-	\item \textbf{clustered} viene creato un grafo, e viene disegnato con l'utility \textsc{neato}~\cite{north2004drawing}. Le coordinate dei nodi nel layout ottenuto sono le posizioni dei punti.
+	\item \textbf{clustered} viene creato un grafo, e viene disegnato con l'utility \textsc{dot}~\cite{gansner2006drawing}. Le coordinate dei nodi nel layout ottenuto sono le posizioni dei punti.
 \end{itemize}
-Per i dataset con criterio \textbf{random} e \textbf{clustered} vengono generate 20 istanze per ogni dimensione. Figure \ref{fig:rnd}-\ref{fig:cls} riportano degli esempi di istanza per questi layout. 
+Per i dataset con criterio \textbf{random} e \textbf{clustered} vengono generate 20 istanze per ogni dimensione. Figure \ref{fig:rnd} e \ref{fig:cls} riportano degli esempi di istanza per questi layout. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.9\columnwidth]{rnd_example}
+	\caption[random]{Esempio di dataset con layout random.}
+	\label{fig:rnd}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.9\columnwidth]{cls_example}
+	\caption[clustered]{Esempio di dataset con layout clustered.}
+	\label{fig:cls}
+\end{figure}
 
 \subsection{Metodologia e Parametri}
 
-Gli esperimenti sono stati svolti su macchine cosicosi. Essi consistono nell'utilizzare le tecniche descritte in Sezione \ref{sec:cplex} e \ref{sec:eur} per risolvere il TSP, sui dataset generati. Per ogni dataset, ogni risolutore viene eseguito 5 volte, e vengono salvati le medie e le standard deviation dei tempi di esecuzione e dei costi delle soluzioni ottime trovate. 
+Gli esperimenti sono stati svolti su macchine cosicosi. Essi consistono nell'utilizzare le tecniche descritte in Sezione \ref{sec:cplex} e \ref{sec:eur} per risolvere il TSP, sui dataset generati. Per ogni dataset, ogni risolutore viene eseguito 5 volte, e vengono salvate le medie e le standard deviation dei tempi di esecuzione e dei costi delle soluzioni ottime trovate. 
 
 Per \textsc{pso} e' stata utilizzata una popolazione di 2.000 individui, 1.000 iterazioni, $\alpha = 0.75$, $\beta=0.1$ (i parametri sono stati scelti empiricamente, senza un estensivo procedimento di ottimizzazione).
 
-Potrebbe essere interessante vedere in percentuale quanti degli archi usati da pso sono parte dell'ottimo. Interessante vedere fevals durante pso.
 
 \subsection{Risultati}
 plotsplotsplots
-
+Potrebbe essere interessante vedere in percentuale quanti degli archi usati da pso sono parte dell'ottimo. Interessante vedere fevals durante pso.
 \section{Conclusioni}\label{sec:conclusioni}
 
 %----------------------------------------------------------------------------------------
