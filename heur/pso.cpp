@@ -134,11 +134,11 @@ int main (int argc, char const *argv[])
 	int pop_size = 2000;
 	const std::string filename = argv[1];
 	if (argc > 2) pop_size = int(atoi(argv[2]));
-	int iterations = 100;
+	int iterations = 1000;
 	if (argc > 3) iterations = int(atoi(argv[3]));
-	double alpha = 0.5;
+	double alpha = 0.75;
 	if (argc > 4) alpha = double(atof(argv[4]));
-	double beta = 0.5;
+	double beta = 0.1;
 	if (argc > 5) alpha = double(atof(argv[5]));
 	
 	srand((unsigned)time(NULL));
@@ -212,8 +212,8 @@ int main (int argc, char const *argv[])
 	    for (int i=0; i<pop_size; i++){
 			//3.1 calculate difference between P_i and X_i
 			// A = P_i - X_i, where A is a basic sequence.
-			std::vector<swap> A = diff(P[i], X[i]);
-			std::vector<swap> B = diff(Pg, X[i]);
+			std::vector<swap> A = diff(P[i], applySwaps(X[i], V[i]));
+			std::vector<swap> B = diff(Pg, applySwaps(X[i], V[i]));
 			
 			// now lets compute A*alpha and B*beta
 			for (int j=A.size()-1; j>=0; j--){
@@ -233,30 +233,32 @@ int main (int argc, char const *argv[])
 			newV.insert(newV.end(), A.begin(), A.end());
 			newV.insert(newV.end(), B.begin(), B.end());
 			// transform the swap sequence in Basic sequence form
-			newV = toBasicSequence(newV, n_vars);
+			V[i] = toBasicSequence(newV, n_vars);
 			// update position with formula X_i = X_i + V_i
-			X[i] = applySwaps(X[i], newV);
+			// X[i] = applySwaps(X[i], newV);
+			
+			// V[i].clear();
 			
 			// update fevals
-			fevals[i] = evalSolution(X[i], objCost, n_vars);
+			fevals[i] = evalSolution(applySwaps(X[i], V[i]), objCost, n_vars);
 			// possibly update P
 			if (fevals[i] < fevalsP[i]){
 				fevalsP[i] = fevals[i];
-				P[i] = X[i];
+				P[i] = applySwaps(X[i], V[i]);
 			}
 		}
 		// possibly update Pg
 		globBestIndex = distance(fevals.begin(), min_element(fevals.begin(), fevals.end()));
-		Pg = X[globBestIndex];
+		Pg = applySwaps(X[globBestIndex], V[globBestIndex]);
 		
 		if (fevals[globBestIndex] < fevalsPg){
 			fevalsPg = fevals[globBestIndex];
-			Pg = X[globBestIndex];
+			Pg = applySwaps(X[globBestIndex], V[globBestIndex]);
 		}
 	}
 	double elapsedtime = (std::clock() - start) / (double)(CLOCKS_PER_SEC);
 	//std::cout << "Time: " << elapsedtime << std::endl;
-	//std::cout << "best: " << fevalsPg << std::endl;
+	std::cout << "best: " << fevalsPg << std::endl;
 	saveSolution(elapsedtime, fevalsPg, std::vector<int>(0));
 	//printarr1(shiftToFirst(Pg));
 }
