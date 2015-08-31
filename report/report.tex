@@ -114,7 +114,7 @@ In questa sezione viene descritto in che modo e' stato realizzato il modello per
 \begin{enumerate}
  \item legge il problema in input, che consiste in un file di testo riportante la matrice contenente i costi degli archi del grafo (separati da virgole), e inizializza le variabili del problema e la funzione obiettivo, impostando i vincoli di tipo e i bounds per ciascuna variabile;
  \item per ogni vincolo, lo crea e lo aggiunge alla matrice dei coefficienti dell'istanza del problema. Le variabili relative ai cappi (cioe' $x_{ii}, y_{ii}$) vengono rimosse;
- \item esegue l'ottimizzazione e salva i risultati su file, tra i quali tempo di esecuzione, path ottimo, soluzione ottima trovata.
+ \item esegue l'ottimizzazione e salva i risultati su file, tra i quali tempo di esecuzione, path ottimo, costo della soluzione ottima trovata.
 \end{enumerate}
 
 %----------------------------------------------------------------------------------------
@@ -126,18 +126,22 @@ In questa sezione vengono descritte le metaeuristiche implementate per la risolu
 
 \subsection{Particle Swarm Optimization}
 
-PSO e' una metaeuristica basata su popolazione. In esso, gli individui $x_i$ (possibili soluzioni) si muovono nello spazio N-dimensionale secondo le loro rispettive velocita' $v_i$. In PSO gli individui ricordano la miglior posizione da loro visitata, e la miglior posizione globale visitata. Tali posizioni influiscono sulla velocita' dell'iterazione successiva. Per applicare tale metodo a TSP e' necessario renderlo discreto. E' stata scelta la rappresentazione proposta in~\cite{1259748} e ripresa in~\cite{shi2007particle}, dove gli individui sono cicli sul grafo, e le velocita' sono sequenze di ``Swap Operator''. Uno Swap Operator e' definito da una coppia $(i, j)$, la sua applicazione su un ciclo $x_k$ ha l'effetto di scambiare la componente $i$-esima con la componente $j$-esima. 
+\textsc{pso} e' una metaeuristica basata su popolazione. In esso, gli individui $x_k$ (possibili soluzioni) si muovono nello spazio N-dimensionale secondo le loro rispettive velocita' $v_k$. In \textsc{pso} gli individui ricordano la miglior posizione da loro visitata, e la miglior posizione globale visitata dalla popolazione. Tali posizioni influiscono sulla velocita' dell'iterazione successiva. 
 
-%La regola di update delle velocita' e' la seguente:
+Per applicare tale metodo a TSP e' necessario renderlo discreto. E' stata scelta la rappresentazione proposta in~\cite{1259748} e ripresa in~\cite{shi2007particle}. In essa, gli individui sono cicli sul grafo che rappresenta il problema, e le velocita' sono sequenze di ``Swap Operator''. Uno Swap Operator (SO) e' definito da una coppia $(i, j)$, la sua applicazione su una soluzione $x_k$ ha l'effetto di scambiare la componente $i$-esima con la componente $j$-esima. E' importante notare che dato che le soluzioni $x_k$ sono cicli sul grafo, l'applicazione di uno SO ad una soluzione $x_k$ genera una nuova soluzione valida. Per formalizzare la rappresentazione  e' necessario introdurre 4 operatori:
+\begin{itemize}
+\item $x + v,$ dove $x$ e' una possibile soluzione e $v$ e' una sequenza di SO. Ottiene una nuova soluzione applicando gli SO in $v$ alla soluzione $x$;
+\item $v_1 \otimes v_2,$ dove $v_1, v_2$ sono sequenze di SO. Produce la piu' corta sequenza di SO il cui effetto e' equivalente all'applicazione di $v_1$ e $v_2$ in successione;
+\item $x-y,$ dove $x, y$ sono possibili soluzioni. Produce la piu' corta sequenza di SO che applicata a $y$ (con l'operatore $+$) ritorna $x$;
+\item $a * v,$ dove $a$ e' uno scalare, e $v$ e' una sequenza di SO. Produce una nuova sequenza di SO a partire da $v$ rimuovendo con probabilita' $1-a$ ogni suo SO.
+\end{itemize}
+La regola di aggiornamento delle velocita' per il generico individuo $k$ all'iterazione $i$-esima e' la seguente:
 
-%\[ v_{i+1} = v_i \otimes \alpha \ast (p_i - x_i) \otimes \beta \ast (g - x_i) \quad \alpha, \beta \in [0, 1].\]
+\[ v^{(i+1)}_k = v_k^{(i)} \otimes \alpha \ast (p_k^{(i)} - x_k) \otimes \beta \ast (g^{(i)} - x_k) \quad \alpha, \beta \in [0, 1], \]
 
-%Alla fine dell'iterazione $i$-esima, la l'individuo $k$ si trova in posizione $x_k = x_{0} + v_{i}$
+dove $p_k^{(i)}$ e' la miglior soluzione visitata dall'individuo $k$, e $g^{(i)}$ e' la miglior soluzione visitata dalla popolazione, finora. Alla fine dell'iterazione $i$-esima l'individuo $x_k$ si trova in posizione $x_k + v_k^{(i)}$. Ad ogni iterazione ogni individuo viene valutato e le miglior soluzioni visitate vengono aggiornate.
 
-E' stato realizzato un singolo file \texttt{pso.cpp}. Il file legge il problema in input (nel formato riportato in Sezione~\ref{sec:cplex}. La popolazione e' inizializzata con individui random (cicli sul grafo), le velocita' iniziali sono sequenze di Swap Operators di lunghezza random tra 0 ed $N$ (numero di nodi). Gli elementi su cui effettuare swap sono scelti in maniera random. Viene eseguita l'ottimizzazione e vengono salvati i risultati su file.
-I parametri usati per l'algoritmo sono rispettivamente: numero di iterazioni $K = 100$, dimensione della popolazione $ps = 20000$, e probabilita' $\alpha, \beta = 0.5$.
-
-Qui devi per forza scrivere in forma piu estesa come funziona.
+E' stato realizzato un singolo file \texttt{pso.cpp}. Il file legge il problema in input (nel formato riportato in Sezione~\ref{sec:cplex}). La popolazione e' inizializzata con individui random, le velocita' iniziali sono sequenze di SO di lunghezza random tra 0 ed $N$ (numero di nodi). Gli elementi su cui effettuare swap sono scelti in maniera random. Viene eseguita l'ottimizzazione e vengono salvati i risultati su file.
 
 \section{Esperimenti}\label{sec:exp}
 In questa sezione vengono riportate le tecniche utilizzate per generare i dataset, le metodologie usate per gli esperimenti, e i risultati ottenuti.
@@ -147,15 +151,17 @@ I dataset consistono in insiemi di $n$ punti, $n \in \{9, 16, 25, 36, 49, 64\}$,
 \begin{itemize}
 	\item \textbf{random} i punti sono scelte in maniera casuale;
 	\item \textbf{uniform} i punti sono disposti a formare una griglia;
-	\item \textbf{clustered} .
+	\item \textbf{clustered} viene creato un grafo, e viene disegnato con l'utility \textsc{neato}~\cite{north2004drawing}. Le coordinate dei nodi nel layout ottenuto sono le posizioni dei punti.
 \end{itemize}
-Per i dataset con criterio \textbf{random} e \textbf{clustered} vengono generate 20 istanze per ogni dimensione.
+Per i dataset con criterio \textbf{random} e \textbf{clustered} vengono generate 20 istanze per ogni dimensione. Figure \ref{fig:rnd}-\ref{fig:cls} riportano degli esempi di istanza per questi layout. 
 
-\subsection{Metodologia}
-Io scriverei qui i parametri utilizzati per l'algoritmo.
-Mia idea e'. Per ogni istanza fai andare 5 times cplex. Salva tempo, best, path.
-Poi fai andare 5 times pso. Salva tempo, best, path. 
-Plotto tempo avg per growing sizes. Best avg per growing sizes. Error avg per growing sizes.
+\subsection{Metodologia e Parametri}
+
+Gli esperimenti sono stati svolti su macchine cosicosi. Essi consistono nell'utilizzare le tecniche descritte in Sezione \ref{sec:cplex} e \ref{sec:eur} per risolvere il TSP, sui dataset generati. Per ogni dataset, ogni risolutore viene eseguito 5 volte, e vengono salvati le medie e le standard deviation del tempo di esecuzione e dei costi delle soluzioni ottime trovate. 
+
+Per \textsc{pso} e' stata utilizzata una popolazione di 20.000 individui, 100 iterazioni, $\alpha = 0.75$, $\beta=0.1$ (i parametri sono stati scelti empiricamente, senza un estensivo procedimento di ottimizzazione).
+
+Potrebbe essere interessante vedere in percentuale quanti degli archi usati da pso sono parte dell'ottimo
 
 \subsection{Risultati}
 plotsplotsplots
