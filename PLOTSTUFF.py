@@ -62,9 +62,10 @@ for m in ['cplex', 'pso']:
 
 
 df = pd.DataFrame(plot_vals, index=np.array(dims), columns=plot_names)
-df.plot(kind='line', logy=True, linewidth=2, colormap='rainbow')
+df.plot(kind='line', logy=True, linewidth=2, colormap='rainbow', marker='^')
 plt.xlabel("nodes", fontsize=18)
 plt.ylabel("time", fontsize=18)
+plt.xlim((0, 65))
 # We change the fontsize of minor ticks label
 plt.tick_params(axis='both', which='major', labelsize=14)
 plt.tick_params(axis='both', which='minor', labelsize=14)
@@ -103,10 +104,10 @@ for m in ['cplex', 'pso']:
         plot_names.append("%s_%s" % (m, pt))
 
 
-df = pd.DataFrame(plot_vals, columns=plot_names)
-print df
-df.plot(kind='line', logy=True, linewidth=2, colormap='rainbow')
+df = pd.DataFrame(plot_vals, index=np.array(dims), columns=plot_names)
+df.plot(kind='line', logy=True, linewidth=2, colormap='rainbow', marker='^')
 plt.xlabel("nodes")
+plt.xlim((0, 65))
 plt.ylabel("time")
 plt.xlabel("nodes", fontsize=18)
 plt.ylabel("time", fontsize=18)
@@ -114,16 +115,14 @@ plt.tick_params(axis='both', which='major', labelsize=14)
 plt.tick_params(axis='both', which='minor', labelsize=14)
 plt.savefig("due.png", bbox_inches='tight')
 plt.clf()
-exit()
-# 3. plot sulle x le sizes sulle y l'errore di pso sull'ottimo trovato da cplex con stdbars
 
+# 3. plot sulle x le sizes sulle y l'errore di pso sull'ottimo trovato da cplex con stdbars
 plot_vals = np.zeros((len(dims), 0))
 plot_errors = np.zeros((len(dims), 0))
 plot_names = list()
 
-
 def get_opt(filename):
-    return np.loadtxt("./cplex/%s_%s_%s_%s.csv" % filename[:-4].split("_"), delimiter=",")[0]
+    return np.loadtxt("./results/cplex/%s_%s_%s_%s.csv" % tuple(filename[:-4].split("_")), delimiter=",")[0]
 
 for m in ['pso']:
     rFolder = "./results/%s/" % m
@@ -137,26 +136,26 @@ for m in ['pso']:
         # now in t we have only datasets with dimensionality dim
         res = np.zeros(len(t))
         for i, f in enumerate(t):
-            best_for_m = np.loadtxt(rFolder + f, delimiter=",", )[1]
-            optimum = get_opt(f)
-            res[i] = (best_for_m - optimum)/float(optimum)
+            res[i] = np.loadtxt(rFolder + f, delimiter=",", )[-1:]
         resM[k] = res.mean()
         stdM[k] = res.std()
     plot_vals = np.hstack((plot_vals, resM[:, None]))
     plot_errors = np.hstack((plot_errors, stdM[:, None]))
     plot_names.append(m)
 
+print plot_vals
+print plot_errors
 
-df = pd.DataFrame(plot_vals, columns=plot_names)
-
-df.plot(kind='line', yerr=plot_errors, linewidth=2, colormap='rainbow')
-
-# plt.errorbar(x, y, e, linestyle='None', marker='^')
-
-plt.xlabel("nodes")
-plt.ylabel("error %")
-plt.show()
-
+df = pd.DataFrame(np.abs(plot_vals), index=np.array(dims), columns=plot_names)
+df_error = pd.DataFrame(np.abs(plot_errors), index=np.array(dims), columns=plot_names)
+df.plot(kind='line', legend=True, linewidth=3)
+plt.errorbar(np.array(dims), plot_vals, plot_errors, linestyle='None', marker='o', elinewidth=2,)
+plt.xlabel("nodes", fontsize=18)
+plt.xlim((0, 65))
+plt.ylabel("error %", fontsize=18)
+plt.tick_params(axis='both', which='major', labelsize=14)
+plt.tick_params(axis='both', which='minor', labelsize=14)
+plt.savefig("tre.png", bbox_inches='tight')
 plt.clf()
 
 # plt.savefig("%s/%s_feat.png" % (fold, f[:-4]), bbox_inches='tight')
