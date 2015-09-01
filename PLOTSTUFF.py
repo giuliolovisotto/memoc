@@ -11,6 +11,7 @@ pd.set_option('display.mpl_style', 'default')
 pd.set_option('display.width', 5000)
 plt.rcParams['figure.figsize'] = (15, 8)
 pd.set_option('display.max_columns', 60)
+
 plt.ioff()
 def getInfo(filename):
     fn = filename[:-4]  # remove extension
@@ -27,7 +28,7 @@ datasets = [ f for f in os.listdir(dFolder) if os.path.isfile(os.path.join(dFold
 
 datasets = filter(lambda x: x[-4:] == ".csv", datasets)
 
-dims = sorted(map(lambda x: int(x.split('_')[2]), datasets))
+dims = sorted(set(map(lambda x: int(x.split('_')[2]), datasets)))
 
 # this is a matrix that in every column has a series of dims elements
 
@@ -60,15 +61,15 @@ for m in ['cplex', 'pso']:
         plot_names.append("%s_%s" % (m, dm))
 
 
-df = pd.DataFrame(plot_vals, columns=plot_names)
-
+df = pd.DataFrame(plot_vals, index=np.array(dims), columns=plot_names)
 df.plot(kind='line', logy=True, linewidth=2, colormap='rainbow')
-plt.xlabel("nodes")
-plt.ylabel("time")
-plt.show()
-
+plt.xlabel("nodes", fontsize=18)
+plt.ylabel("time", fontsize=18)
+# We change the fontsize of minor ticks label
+plt.tick_params(axis='both', which='major', labelsize=14)
+plt.tick_params(axis='both', which='minor', labelsize=14)
+plt.savefig("uno.png", bbox_inches='tight')
 plt.clf()
-
 # 1. plot, sulle x le sizes, sulle y i tempi di esecuzione average sulle varie istanze, una serie per ogni metodo e
 # tipo di punti.
 
@@ -103,14 +104,17 @@ for m in ['cplex', 'pso']:
 
 
 df = pd.DataFrame(plot_vals, columns=plot_names)
-
+print df
 df.plot(kind='line', logy=True, linewidth=2, colormap='rainbow')
 plt.xlabel("nodes")
 plt.ylabel("time")
-plt.show()
-
+plt.xlabel("nodes", fontsize=18)
+plt.ylabel("time", fontsize=18)
+plt.tick_params(axis='both', which='major', labelsize=14)
+plt.tick_params(axis='both', which='minor', labelsize=14)
+plt.savefig("due.png", bbox_inches='tight')
 plt.clf()
-
+exit()
 # 3. plot sulle x le sizes sulle y l'errore di pso sull'ottimo trovato da cplex con stdbars
 
 plot_vals = np.zeros((len(dims), 0))
