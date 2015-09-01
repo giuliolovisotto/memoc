@@ -99,7 +99,7 @@ BCOR5mm, % Binding correction
 
 \section{Introduzione}
 
-Questo documento descrive le metodologie e le strutture sviluppate per l'esercitazione del corso di Metodi e Modelli per l'Ottimizzazione combinatoria, anno accademico 14/15. L'esercitazione consiste nella risoluzione del  Traveling Salesman Problem (TSP) con l'uso di metodi di ottimizzazione. E' stato implementato il modello per il risolutore esatto \textsc{cplex}, e una metaeuristica di tipo particle swarm optimization \textsc{pso}. Il seguente documento e' strutturato come segue: in Sezione~\ref{sec:cplex} viene descritto il modello in \textsc{cplex} (relativo alla Parte 1), in Sezione~\ref{sec:eur} vengono descritte le euristiche utilizzate (relative allla Parte 2), in Sezione~\ref{sec:exp} vengono descritti i dataset e la metodologia usata per l'esperimento, nonche' presentati i risultati. Il documento termina con alcune conclusioni in Sezione~\ref{sec:conclusioni}.
+Questo documento descrive le metodologie e le strutture sviluppate per l'esercitazione del corso di Metodi e Modelli per l'Ottimizzazione combinatoria, anno accademico 14/15. L'esercitazione consiste nella risoluzione del  Traveling Salesman Problem (TSP) con l'uso di metodi di ottimizzazione. E' stato implementato il modello per il risolutore esatto \textsc{cplex}, e una metaeuristica di tipo particle swarm optimization \textsc{pso}. Il seguente documento e' strutturato come segue: in Sezione~\ref{sec:cplex} viene descritto il modello in \textsc{cplex} (relativo alla Parte 1), in Sezione~\ref{sec:eur} vengono descritte le euristiche utilizzate (relative allla Parte 2), in Sezione~\ref{sec:exp} vengono descritte le istanze del problema e la metodologia usata per l'esperimento, nonche' presentati i risultati. Il documento termina con alcune conclusioni in Sezione~\ref{sec:conclusioni}.
 
 \subsection{FILES CONSEGNATI}
 
@@ -144,43 +144,81 @@ dove $p_k^{(i)}$ e' la miglior soluzione visitata dall'individuo $k$, e $g^{(i)}
 E' stato realizzato un singolo file \texttt{pso.cpp}. Gli individui sono rappresentati da array di interi (\texttt{vector<int>}), dove ogni elemento fa riferimento ad un nodo del problema. Gli SO sono coppie di interi, le velocita' (sequenze di SO) sono array di coppie di interi (\texttt{vector<pair<int, int> >}). Gli operatori introdotti precedentemente in questo paragrafo sono realizzati tramite funzioni. Il file legge il problema in input (nel formato riportato in Sezione~\ref{sec:cplex}). La popolazione e' inizializzata con individui random, le velocita' iniziali sono sequenze di SO di lunghezza random tra 0 ed $N$ (numero di nodi). Gli elementi su cui effettuare swap sono scelti in maniera random. Viene eseguita l'ottimizzazione e vengono salvati i risultati su file.
 
 \section{Esperimenti}\label{sec:exp}
-In questa sezione vengono riportate le tecniche utilizzate per generare i dataset, le metodologie usate per gli esperimenti, e i risultati ottenuti.
+In questa sezione vengono riportate le tecniche utilizzate per generare le istanze del problema, le metodologie usate per gli esperimenti, e i risultati ottenuti.
 
 \subsection{Dataset}
-I dataset consistono in insiemi di $n$ punti, $n \in \{9, 16, 25, 36, 49, 64\}$, distribuiti un quadrato bidimensionale con lato di dimensione 1. Sono stati usati 3 diversi criteri per la disposizione dei punti:
+Le istanze di TSP consistono in insiemi di $n$ punti, $n \in \{5, 10, 20, 40, 60\}$, distribuiti un quadrato bidimensionale con lato di dimensione 1. Sono stati usati 3 diversi criteri per la disposizione dei punti:
 \begin{itemize}
 	\item \textbf{random} i punti sono scelte in maniera casuale;
 	\item \textbf{uniform} i punti sono disposti a formare una griglia;
 	\item \textbf{clustered} viene creato un grafo, e viene disegnato con l'utility \textsc{dot}~\cite{gansner2006drawing}. Le coordinate dei nodi nel layout ottenuto sono le posizioni dei punti.
 \end{itemize}
-Per i dataset con criterio \textbf{random} e \textbf{clustered} vengono generate 20 istanze per ogni dimensione. Figure \ref{fig:rnd} e \ref{fig:cls} riportano degli esempi di istanza per questi layout. 
+Per le istanze con criterio \textbf{random} e \textbf{clustered} vengono generate 20 istanze per ogni dimensione. Figure \ref{fig:rnd} e \ref{fig:cls} riportano degli esempi di istanza per questi layout. Una volta generata l'istanza, la matrice delle adiacenze riportante la distanza tra i punti viene calcolata e salvata in un file (verra' fatto riferimento a questo file come \textit{dataset}). Viene calcolata sia la distanza \textbf{euclidea} che la distanza \textbf{manhattan}.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=.9\columnwidth]{rnd_example}
-	\caption[random]{Esempio di dataset con layout random.}
+	\caption[random]{Esempio di istanza con layout random.}
 	\label{fig:rnd}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=.9\columnwidth]{cls_example}
-	\caption[clustered]{Esempio di dataset con layout clustered.}
+	\caption[clustered]{Esempio di istanza con layout clustered.}
 	\label{fig:cls}
 \end{figure}
 
 \subsection{Metodologia e Parametri}
 
-Gli esperimenti sono stati svolti su macchine cosicosi. Essi consistono nell'utilizzare le tecniche descritte in Sezione \ref{sec:cplex} e \ref{sec:eur} per risolvere il TSP, sui dataset generati. Per ogni dataset, ogni risolutore viene eseguito 5 volte, e vengono salvate le medie e le standard deviation dei tempi di esecuzione e dei costi delle soluzioni ottime trovate. 
+Gli esperimenti consistono nell'utilizzare le tecniche descritte in Sezione \ref{sec:cplex} e \ref{sec:eur} per risolvere il TSP, sui dataset generati. Per ogni dataset, ogni risolutore viene eseguito 5 volte, e vengono salvate le medie e le standard deviation dei tempi di esecuzione e dei costi delle soluzioni ottime trovate. Gli esperimenti sono stati svolti su macchine con processore Intel Core i5-2500 da 3.30 GHz. 
 
-Per \textsc{pso} e' stata utilizzata una popolazione di 2.000 individui, 1.000 iterazioni, $\alpha = 0.75$, $\beta=0.1$ (i parametri sono stati scelti empiricamente, senza un estensivo procedimento di ottimizzazione).
-
+Per \textsc{pso} e' stata utilizzata una popolazione di 2.000 individui, 500 iterazioni, $\alpha = 0.75$, $\beta=0.1$ (i parametri sono stati scelti empiricamente, senza un estensivo procedimento di ottimizzazione).
 
 \subsection{Risultati}
-plotsplotsplots
-Potrebbe essere interessante vedere in percentuale quanti degli archi usati da pso sono parte dell'ottimo. Interessante vedere fevals durante pso.
+In questa sezione vengon riportati i risultati degli esperimenti. Se non diversamente riportato, i valori nei grafici sono inizialmente mediati sulle diverse esecuzioni sul singolo dataset, e sono poi mediati sui diversi dataset.
+
+In Figura \ref{fig:uno} e' riportato il tempo di esecuzione in scala logaritmica per le diverse dimensioni dei dataset, diviso per metodo di risoluzione e per tipo di distanza. Si puo' vedere che \textsc{cplex} confrontato con \textsc{pso} e' piu veloce per dimensioni basse del problema, mentre diventa piu' lento all'aumentare del numero di nodi. Questo e' dovuto al fatto che \textsc{cplex} ha tempo di esecuzione esponenziale nella dimensionalita' del problema, ma mostra che per problemi piccoli e' una valida opzione. Dal grafico si puo' inoltre notare che \textsc{pso} e' relativamente lento gia' a dimensioni basse. Infatti tale metaeuristica ha una rappresentazione del problema non banale e quindi richiede dell'overhead iniziale per l'inizializzazione della popolazione e il successivo aggiornamento delle velocita'. Inoltre il numero di valutazioni di funzione utilizzate e' molto alto (2.000 $\times$ 500 = 1.000.000), e non e' presente un criterio di fermata (il che significa che vengono effettuate tutte le valutazioni di funzione ad ogni esecuzione).
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=.9\columnwidth]{uno}
+	\caption[]{Tempi di esecuzione medi per le diverse dimensioni, divisi per metodo e tipo di distanza.}
+	\label{fig:uno}
+\end{figure}
+
+In Figura \ref{fig:due} e' riportato il tempo di esecuzione in scala logaritmica per le diverse dimensioni dei dataset, diviso per metodo di risoluzione e per criterio di disposizione dei punti. COMPLETA QUI VEDI CHE VIEN FUORI
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.9\columnwidth]{due}
+	\caption[]{Tempi di esecuzione medi per le diverse dimensioni, divisi per metodo e criterio di disposizione dei punti del problema. }
+	\label{fig:due}
+\end{figure}
+
+In Figura \ref{fig:tre} e' riportato l'errore medio della soluzione trovata da \textsc{pso}, in percentuale, sul costo della soluzione ottima. Viene inoltre riportato lo scarto quadratico medio di tale errore. Si puo' vedere che \textsc{pso} e' relativamente efficace a basse dimensioni, questo e' dovuto al fatto che con 1.000.000 valutazioni di funzione e' possibile esplorare buona parte dello spazio delle soluzioni su dataset ridotti. La metaeuristica diventa meno precisa a partire da 20 nodi, fino ad arrivare ad un errore medio del \textasciitilde 43\% con 60 nodi.
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=.9\columnwidth]{tre}
+	\caption[]{Media e scarto quadratico medio della percentuale di errore di \textsc{pso} rispetto alla soluzione ottima.}
+	\label{fig:tre}
+\end{figure}
+
+In Figura \ref{fig:quattro} e' riportato il miglioramento della miglior soluzione trovata da \textsc{pso} (in termini di funzione obiettivo) durante l'ottimizzazione. Per ottenere delle medie significative, il valore riportato e' calcolato come la percentuale dell'errore della soluzione corrente (all'iterazione $i$-esima) rispetto all'ottimo trovato da \textsc{cplex}. Si puo' vedere che per dimensionalita' basse \textsc{pso} converge in fretta alla miglior soluzione (che generalmente e' ottima). Al crescere della dimensione del problema, la convergenza diventa piu' lenta, ma la discesa piu' veloce (anche perche' l'errore di partenza e' piu' alto). Infatti, per esempio per 40 nodi, si passa da un errore iniziale sull'ottimo di piu del 180\%, e si arriva alla fine dell'ottimizzazione ad un errore di meno del 20\%. Questo e' significativo, mostra che l'ottimizzazione funziona, ma che non e' in grado di arrivare ad una soluzione buona.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.9\columnwidth]{quattro}
+	\caption[]{Percentuali di errore della miglior soluzione trovata finora rispetto all'ottimo, durante le iterazioni di \textsc{pso}, divise per numero di nodi.}
+	\label{fig:quattro}
+\end{figure}
+
+Potrebbe essere interessante vedere in PERCENTUALE RUSPE quanti degli archi usati da pso sono parte dell'ottimo. 
 \section{Conclusioni}\label{sec:conclusioni}
 
+Durante l'implementazione di questa versione di \textsc{pso} ho avuto modo di notare alcuni difetti. Infatti sono dell'opinione che in questo schema manchi una componente che permetta di esplorare la \textit{neighborhood} senza necessariamente muoversi verso una delle soluzioni gia' visitate. Infatti con tale mancanza, una volta generate gli individui iniziali, tutte le modifiche alle velocita' ``muovono'' gli individui verso uno degli altri, e non c'e alcuna garanzia che l'ottimo stia in questi percorsi. Infatti i risultati mostrano che \textsc{pso} non riesce a performare in maniera discreta oltre i 20 nodi, commettendo errori notevoli.
+ 
+Nonostante cio', ho potuto vedere che \textsc{pso} e' molto piu' veloce di un metodo esatto quale \textsc{cplex}. In particolare, con l'aggiunta di un criterio di terminazione (e.g.: terminare l'ottimizzazione se la miglior soluzione trovata non migliora per $50$ iterazioni), la metaeuristica terminerebbe rapidamente per dimensionalita' basse, con risultati discreti. Infatti \textsc{cplex} diventa estremamente lento al crescere del numero dei nodi, il che lo rende inutilizzabili in contesti reali.
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------

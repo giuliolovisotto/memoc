@@ -63,13 +63,13 @@ for m in ['cplex', 'pso']:
 
 df = pd.DataFrame(plot_vals, index=np.array(dims), columns=plot_names)
 df.plot(kind='line', logy=True, linewidth=2, colormap='rainbow', marker='^')
-plt.xlabel("nodes", fontsize=18)
-plt.ylabel("time", fontsize=18)
+plt.xlabel("numero di nodi", fontsize=18)
+plt.ylabel("tempo di esecuzione (s)", fontsize=18)
 plt.xlim((0, 65))
 # We change the fontsize of minor ticks label
 plt.tick_params(axis='both', which='major', labelsize=14)
 plt.tick_params(axis='both', which='minor', labelsize=14)
-plt.savefig("uno.png", bbox_inches='tight')
+plt.savefig("report/Figures/uno.png", bbox_inches='tight')
 plt.clf()
 # 1. plot, sulle x le sizes, sulle y i tempi di esecuzione average sulle varie istanze, una serie per ogni metodo e
 # tipo di punti.
@@ -106,14 +106,12 @@ for m in ['cplex', 'pso']:
 
 df = pd.DataFrame(plot_vals, index=np.array(dims), columns=plot_names)
 df.plot(kind='line', logy=True, linewidth=2, colormap='rainbow', marker='^')
-plt.xlabel("nodes")
 plt.xlim((0, 65))
-plt.ylabel("time")
-plt.xlabel("nodes", fontsize=18)
-plt.ylabel("time", fontsize=18)
+plt.xlabel("numero di nodi", fontsize=18)
+plt.ylabel("tempo di esecuzione (s)", fontsize=18)
 plt.tick_params(axis='both', which='major', labelsize=14)
 plt.tick_params(axis='both', which='minor', labelsize=14)
-plt.savefig("due.png", bbox_inches='tight')
+plt.savefig("report/Figures/due.png", bbox_inches='tight')
 plt.clf()
 
 # 3. plot sulle x le sizes sulle y l'errore di pso sull'ottimo trovato da cplex con stdbars
@@ -143,23 +141,17 @@ for m in ['pso']:
     plot_errors = np.hstack((plot_errors, stdM[:, None]))
     plot_names.append(m)
 
-print plot_vals
-print plot_errors
-
 df = pd.DataFrame(np.abs(plot_vals), index=np.array(dims), columns=plot_names)
 df_error = pd.DataFrame(np.abs(plot_errors), index=np.array(dims), columns=plot_names)
 df.plot(kind='line', legend=True, linewidth=3)
-plt.errorbar(np.array(dims), plot_vals, plot_errors, linestyle='None', marker='o', elinewidth=2,)
-plt.xlabel("nodes", fontsize=18)
+plt.errorbar(np.array(dims), plot_vals, plot_errors, ecolor='black', linestyle='b', marker='o', elinewidth=2,)
+plt.xlabel("numero di nodi", fontsize=18)
 plt.xlim((0, 65))
-plt.ylabel("error %", fontsize=18)
+plt.ylabel("errore (%)", fontsize=18)
 plt.tick_params(axis='both', which='major', labelsize=14)
 plt.tick_params(axis='both', which='minor', labelsize=14)
-plt.savefig("tre.png", bbox_inches='tight')
+plt.savefig("report/Figures/tre.png", bbox_inches='tight')
 plt.clf()
-exit()
-# plt.savefig("%s/%s_feat.png" % (fold, f[:-4]), bbox_inches='tight')
-#plt.ylim(min(d['std'].min()-1, d['mean'].min()-1), max(d['std'].max()+1, d['mean'].max()+1))
 
 # 4, plot sulle x le iterations di pso, sulle y una serie per ogni dimensionalita, con i valori che sono l'errore percentuale sull'ottimo a quel punto
 
@@ -169,27 +161,38 @@ datasets = [ f for f in os.listdir(rFolder) if os.path.isfile(os.path.join(rFold
 datasets = filter(lambda x: x[-4:] == ".csv", datasets)
 resM = np.zeros((len(dims), iterations))
 stdM = np.zeros((len(dims), iterations))
-plot_vals = np.zeros((len(dims), 0))
-plot_errors = np.zeros((len(dims), 0))
 plot_names = list()
 for k, dim in enumerate(dims):
-        # filter with dimensionality
-        t = filter(lambda x: int(getInfo(x)[2]) == dim, datasets)
-        # now in t we have only datasets with dimensionality dim
-        res = np.zeros(len(t), iterations)
-        for i, f in enumerate(t):
-            res[i] = np.loadtxt(rFolder + f, delimiter=",", )[2:]
-        resM[k] = res.mean(axis=0)
-        stdM[k] = res.std(axis=0)
-        plot_vals = np.hstack((plot_vals, resM.T))
-        plot_errors = np.hstack((plot_errors, stdM.T))
-        plot_names.append(dim)
-    
+    # filter with dimensionality
+    t = filter(lambda x: int(getInfo(x)[2]) == dim, datasets)
+    # now in t we have only datasets with dimensionality dim
+    res = np.zeros((len(t), iterations))
+    for i, f in enumerate(t):
+        res[i] = np.loadtxt(rFolder + f, delimiter=",", )[2:]
+    resM[k] = res.mean(axis=0)
+    stdM[k] = res.std(axis=0)
+    plot_names.append(dim)
+
+plot_vals = resM.T
+plot_errors = stdM.T
+
 df = pd.DataFrame(plot_vals, columns=plot_names)
 df.plot(kind='line', linewidth=2, colormap='rainbow')
-# plt.errorbar(x, y, e, linestyle='None', marker='^')
-plt.xlabel("iterations")
-plt.ylabel("error %")
-plt.show()
+# prendiamo 5 punti per plottare i markers
+indici = (np.array([0,1,2,3,4,4.99])*100).astype(int)
+xs = np.arange(500)[indici]
+ys = plot_vals[indici, :]
+styles = ['s', 'D', '^', '*', 'o']
+colors = ['purple', 'dodgerblue', 'springgreen', 'orange', 'red']
+for l in range(plot_vals.shape[1]):
+    plt.plot(xs, ys[:, l], marker=styles[l], color=colors[l], lw=0)
+
+# plt.errorbar(df.index, plot_vals, plot_errors, ecolor='black', linestyle='b', marker='o', elinewidth=2,)
+plt.xlabel("iterazioni", fontsize=18)
+plt.ylabel("errore (%)", fontsize=18)
+plt.legend(title="numero di nodi")
+plt.tick_params(axis='both', which='major', labelsize=14)
+plt.tick_params(axis='both', which='minor', labelsize=14)
+plt.savefig("report/Figures/quattro.png", bbox_inches='tight')
 plt.clf()
 
