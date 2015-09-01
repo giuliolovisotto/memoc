@@ -196,3 +196,38 @@ plt.tick_params(axis='both', which='minor', labelsize=14)
 plt.savefig("report/Figures/quattro.png", bbox_inches='tight')
 plt.clf()
 
+# --------------------------------------------------------------------------------------- #
+# 5, plot sulle x dimensioni, sulle y errori rispetto ottimo diviso per tipo di punti
+# --------------------------------------------------------------------------------------- #
+rFolder = "results/pso/"
+datasets = [ f for f in os.listdir(rFolder) if os.path.isfile(os.path.join(rFolder, f)) ]
+datasets = filter(lambda x: x[-4:] == ".csv", datasets)
+
+plot_vals = np.zeros((5, 3))  # 5 dimensions, 3 tipi (cls, rnd, uni)
+plot_err = np.zeros((5, 3))
+plot_names = list()
+for j, pt in enumerate(['cls', 'rnd', 'uni']):
+    s = filter(lambda x: pt in x, datasets)
+    for k, dim in enumerate(dims):
+        # filter with dimensionality
+        t = filter(lambda x: int(getInfo(x)[2]) == dim, s)
+        # now in t we have only datasets with dimensionality dim and type point pt
+        res = np.zeros((len(t),))
+        for i, f in enumerate(t):
+            res[i] = np.loadtxt(rFolder + f, delimiter=",", )[-1:]
+        plot_vals[k, j] = res.mean()
+        plot_err[k, j] = res.mean()
+    plot_names.append("%s" % (pt))
+
+df = pd.DataFrame(plot_vals, index=np.array(dims), columns=plot_names)
+df.plot(kind='line', linewidth=2, colormap='rainbow', marker='^')
+
+plt.xlabel("numero di nodi", fontsize=18)
+plt.ylabel("errore (%)", fontsize=18)
+plt.legend(title="tipo di punti")
+plt.xlim((0, 65))
+plt.tick_params(axis='both', which='major', labelsize=14)
+plt.tick_params(axis='both', which='minor', labelsize=14)
+plt.savefig("report/Figures/cinque.png", bbox_inches='tight')
+plt.clf()
+

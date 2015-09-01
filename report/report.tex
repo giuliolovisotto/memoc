@@ -186,16 +186,16 @@ In Figura \ref{fig:uno} e' riportato il tempo di esecuzione in scala logaritmica
 	\label{fig:uno}
 \end{figure}
 
-In Figura \ref{fig:due} e' riportato il tempo di esecuzione in scala logaritmica per le diverse dimensioni dei dataset, diviso per metodo di risoluzione e per criterio di disposizione dei punti. COMPLETA QUI VEDI CHE VIEN FUORI
+In Figura \ref{fig:due} e' riportato il tempo di esecuzione in scala logaritmica per le diverse dimensioni dei dataset, diviso per metodo di risoluzione e per criterio di disposizione dei punti. Si puo' vedere che per la disposizione dei punti di tipo \textbf{uniform} sia \textsc{cplex} che \textsc{pso} risultano piu' veloci rispetto alle altre disposizioni \textbf{clustered} e \textbf{random}. Per queste non ci sono significative differenze.
 
-\begin{figure}[H]
+\begin{figure}[htpb]
 	\centering
 	\includegraphics[width=.9\columnwidth]{due}
 	\caption[]{Tempi di esecuzione medi per le diverse dimensioni, divisi per metodo e criterio di disposizione dei punti del problema. }
 	\label{fig:due}
 \end{figure}
 
-In Figura \ref{fig:tre} e' riportato l'errore medio della soluzione trovata da \textsc{pso}, in percentuale, sul costo della soluzione ottima. Viene inoltre riportato lo scarto quadratico medio di tale errore. Si puo' vedere che \textsc{pso} e' relativamente efficace a basse dimensioni, questo e' dovuto al fatto che con 1.000.000 valutazioni di funzione e' possibile esplorare buona parte dello spazio delle soluzioni su dataset ridotti. La metaeuristica diventa meno precisa a partire da 20 nodi, fino ad arrivare ad un errore medio del \textasciitilde 43\% con 60 nodi.
+In Figura \ref{fig:tre} e' riportato l'errore medio della soluzione trovata da \textsc{pso}, in percentuale, sul costo della soluzione ottima. Viene inoltre riportato lo scarto quadratico medio di tale errore. Si puo' vedere che \textsc{pso} e' relativamente efficace a basse dimensioni, questo e' dovuto al fatto che con 1.000.000 valutazioni di funzione e' possibile esplorare buona parte dello spazio delle soluzioni su dataset ridotti. La metaeuristica diventa meno precisa a partire da 20 nodi, fino ad arrivare ad un errore medio del \textasciitilde 45\% con 60 nodi.
 
 \begin{figure}[htpb]
 	\centering
@@ -204,7 +204,17 @@ In Figura \ref{fig:tre} e' riportato l'errore medio della soluzione trovata da \
 	\label{fig:tre}
 \end{figure}
 
-In Figura \ref{fig:quattro} e' riportato il miglioramento della miglior soluzione trovata da \textsc{pso} (in termini di funzione obiettivo) durante l'ottimizzazione. Per ottenere delle medie significative, il valore riportato e' calcolato come la percentuale dell'errore della soluzione corrente (all'iterazione $i$-esima) rispetto all'ottimo trovato da \textsc{cplex}. Si puo' vedere che per dimensionalita' basse \textsc{pso} converge in fretta alla miglior soluzione (che generalmente e' ottima). Al crescere della dimensione del problema, la convergenza diventa piu' lenta, ma la discesa piu' veloce (anche perche' l'errore di partenza e' piu' alto). Infatti, per esempio per 40 nodi, si passa da un errore iniziale sull'ottimo di piu del 180\%, e si arriva alla fine dell'ottimizzazione ad un errore di meno del 20\%. Questo e' significativo, mostra che l'ottimizzazione funziona, ma che non e' in grado di arrivare ad una soluzione buona.
+Anche Figura \ref{fig:cinque} riporta l'errore medio in percentuale, diviso per tipo di punti del dataset. Le disposizioni di tipo \textbf{uniform} hanno un errore minore, mentre le \textbf{random} e le \textbf{clustered} commettono errori piu' grandi, e le prime sono in media meno buone rispetto alle seconde. Questo mostra che la maggior parte della varianza riportata in Figura \ref{fig:tre} e' dovuta alla differente tecnica di disposizione dei punti.
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=.9\columnwidth]{cinque}
+	\caption[]{Media della percentuale di errore di \textsc{pso} rispetto alla soluzione ottima, diviso per criterio di disposizione dei punti del problema.}
+	\label{fig:cinque}
+\end{figure}
+
+
+In Figura \ref{fig:quattro} e' riportato il miglioramento della miglior soluzione trovata da \textsc{pso} (in termini di funzione obiettivo) durante l'ottimizzazione. Per ottenere delle medie significative, il valore riportato e' calcolato come la percentuale dell'errore della soluzione corrente (all'iterazione $i$-esima) rispetto all'ottimo trovato da \textsc{cplex}. Si puo' vedere che per dimensionalita' basse \textsc{pso} converge in fretta alla miglior soluzione (che generalmente e' ottima). Al crescere della dimensione del problema, la convergenza diventa piu' lenta, ma la discesa piu' veloce (anche perche' l'errore di partenza e' piu' alto). Infatti, per esempio per 40 nodi, si passa da un errore iniziale sull'ottimo di piu del 200\%, e si arriva alla fine dell'ottimizzazione ad un errore del 20\%. Questo e' significativo, mostra che l'ottimizzazione funziona, ma che non e' in grado di arrivare ad una soluzione buona.
 
 \begin{figure}[H]
 	\centering
@@ -213,7 +223,6 @@ In Figura \ref{fig:quattro} e' riportato il miglioramento della miglior soluzion
 	\label{fig:quattro}
 \end{figure}
 
-Potrebbe essere interessante vedere in PERCENTUALE RUSPE quanti degli archi usati da pso sono parte dell'ottimo. 
 \section{Conclusioni}\label{sec:conclusioni}
 
 Durante l'implementazione di questa versione di \textsc{pso} ho avuto modo di notare alcuni difetti. Infatti sono dell'opinione che in questo schema manchi una componente che permetta di esplorare la \textit{neighborhood} senza necessariamente muoversi verso una delle soluzioni gia' visitate. Infatti con tale mancanza, una volta generate gli individui iniziali, tutte le modifiche alle velocita' ``muovono'' gli individui verso uno degli altri, e non c'e alcuna garanzia che l'ottimo stia in questi percorsi. Infatti i risultati mostrano che \textsc{pso} non riesce a performare in maniera discreta oltre i 20 nodi, commettendo errori notevoli.
