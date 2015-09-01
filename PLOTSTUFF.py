@@ -157,7 +157,7 @@ plt.tick_params(axis='both', which='major', labelsize=14)
 plt.tick_params(axis='both', which='minor', labelsize=14)
 plt.savefig("tre.png", bbox_inches='tight')
 plt.clf()
-
+exit()
 # plt.savefig("%s/%s_feat.png" % (fold, f[:-4]), bbox_inches='tight')
 #plt.ylim(min(d['std'].min()-1, d['mean'].min()-1), max(d['std'].max()+1, d['mean'].max()+1))
 
