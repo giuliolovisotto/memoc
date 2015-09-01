@@ -15,10 +15,15 @@
 
 typedef std::pair<int, int> swap;
 
-void saveSolution(const double& time, const double& objVal, const std::vector<int>& path){
+void saveSolution(const double& time, const double& objVal, const std::vector<double>& optH){
   std::ofstream results;
   results.open ("results.csv");
-  results << time << "," << objVal << std::endl;
+  results << time << "," << objVal << ",";
+  results << optH[0];
+  for (int i=1; i<optH.size(); i++){
+	results << "," << optH[i];
+  }
+  results << std::endl;
   results.close();
 }
 
@@ -134,16 +139,20 @@ int main (int argc, char const *argv[])
 	int pop_size = 2000;
 	const std::string filename = argv[1];
 	if (argc > 2) pop_size = int(atoi(argv[2]));
-	int iterations = 1000;
+	int iterations = 500;
 	if (argc > 3) iterations = int(atoi(argv[3]));
 	double alpha = 0.75;
 	if (argc > 4) alpha = double(atof(argv[4]));
 	double beta = 0.1;
 	if (argc > 5) alpha = double(atof(argv[5]));
 	
+	std::vector<double> optHistory(iterations);
+	
 	srand((unsigned)time(NULL));
 	std::vector<double>* objCost = readObjFunArray(filename.c_str());
 	const int n_vars = (int)(sqrt(objCost->size()));
+	
+	
 	
 	std::clock_t start;
 	start = std::clock();
@@ -187,15 +196,15 @@ int main (int argc, char const *argv[])
 	
 	//evaluate global best
 	for (int i=0; i<pop_size; i++){
-		fevals[i] = evalSolution(X[i], objCost, n_vars);
-		fevalsP[i] = evalSolution(X[i], objCost, n_vars);
+		fevals[i] = evalSolution(applySwaps(X[i], V[i]), objCost, n_vars);
+		fevalsP[i] = evalSolution(applySwaps(X[i], V[i]), objCost, n_vars);
 		//std::cout << evals[i] << std::endl;
 	}
 	
 	int globBestIndex = distance(fevals.begin(), min_element(fevals.begin(), fevals.end()));
 	// std::cout << globBestIndex << std::endl;
 	// save global best position and value
-	Pg = X[globBestIndex];
+	Pg = applySwaps(X[globBestIndex], V[globBestIndex]);
 	fevalsPg = fevals[globBestIndex];
 	//start pso
 
@@ -255,10 +264,11 @@ int main (int argc, char const *argv[])
 			fevalsPg = fevals[globBestIndex];
 			Pg = applySwaps(X[globBestIndex], V[globBestIndex]);
 		}
+		optHistory[k] = fevalsPg;
 	}
 	double elapsedtime = (std::clock() - start) / (double)(CLOCKS_PER_SEC);
 	//std::cout << "Time: " << elapsedtime << std::endl;
-	std::cout << "best: " << fevalsPg << std::endl;
-	saveSolution(elapsedtime, fevalsPg, std::vector<int>(0));
+	//std::cout << "best: " << fevalsPg << std::endl;
+	saveSolution(elapsedtime, fevalsPg, optHistory);
 	//printarr1(shiftToFirst(Pg));
 }

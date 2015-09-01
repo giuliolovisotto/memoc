@@ -133,7 +133,7 @@ for m in ['pso']:
         # now in t we have only datasets with dimensionality dim
         res = np.zeros(len(t))
         for i, f in enumerate(t):
-            best_for_m = np.loadtxt(rFolder + f, delimiter=",", )[0]
+            best_for_m = np.loadtxt(rFolder + f, delimiter=",", )[1]
             optimum = get_opt(f)
             res[i] = (best_for_m - optimum)/float(optimum)
         resM[k] = res.mean()
@@ -158,4 +158,35 @@ plt.clf()
 # plt.savefig("%s/%s_feat.png" % (fold, f[:-4]), bbox_inches='tight')
 #plt.ylim(min(d['std'].min()-1, d['mean'].min()-1), max(d['std'].max()+1, d['mean'].max()+1))
 
+# 4, plot sulle x le iterations di pso, sulle y una serie per ogni dimensionalita, con i valori che sono l'errore percentuale sull'ottimo a quel punto
+
+iterations = 500
+rFolder = "results/pso/"
+datasets = [ f for f in os.listdir(rFolder) if os.path.isfile(os.path.join(rFolder, f)) ]
+datasets = filter(lambda x: x[-4:] == ".csv", datasets)
+resM = np.zeros((len(dims), iterations))
+stdM = np.zeros((len(dims), iterations))
+plot_vals = np.zeros((len(dims), 0))
+plot_errors = np.zeros((len(dims), 0))
+plot_names = list()
+for k, dim in enumerate(dims):
+        # filter with dimensionality
+        t = filter(lambda x: int(getInfo(x)[2]) == dim, datasets)
+        # now in t we have only datasets with dimensionality dim
+        res = np.zeros(len(t), iterations)
+        for i, f in enumerate(t):
+            res[i] = np.loadtxt(rFolder + f, delimiter=",", )[2:]
+        resM[k] = res.mean(axis=0)
+        stdM[k] = res.std(axis=0)
+        plot_vals = np.hstack((plot_vals, resM.T))
+        plot_errors = np.hstack((plot_errors, stdM.T))
+        plot_names.append(dim)
+    
+df = pd.DataFrame(plot_vals, columns=plot_names)
+df.plot(kind='line', linewidth=2, colormap='rainbow')
+# plt.errorbar(x, y, e, linestyle='None', marker='^')
+plt.xlabel("iterations")
+plt.ylabel("error %")
+plt.show()
+plt.clf()
 
