@@ -1,2 +1,2 @@
 # memoc
-stuff for memoc course at unipd
+Code, data and report for memoc course at unipd
