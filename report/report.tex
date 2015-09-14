@@ -99,7 +99,7 @@ BCOR5mm, % Binding correction
 
 \section{Introduzione}
 
-Questo documento descrive gli approcci sviluppati per l'esercitazione del corso di Metodi e Modelli per l'Ottimizzazione Combinatoria, anno accademico 14/15. L'esercitazione consiste nella risoluzione del  Traveling Salesman Problem (TSP) con l'uso di metodi di ottimizzazione. E' stato implementato un modello per il risolutore esatto \textsc{cplex}, e una metaeuristica di tipo particle swarm optimization \textsc{pso}. Il seguente documento e' strutturato come segue: in Sezione~\ref{sec:cplex} viene descritto il modello in \textsc{cplex} (relativo alla Parte 1), in Sezione~\ref{sec:eur} vengono descritte le euristiche utilizzate (relative allla Parte 2), in Sezione~\ref{sec:exp} vengono descritte le istanze del problema e la metodologia usate per l'esperimento, nonche' presentati i risultati. Il documento termina con alcune conclusioni in Sezione~\ref{sec:conclusioni}.
+Questo documento descrive gli approcci sviluppati per l'esercitazione del corso di Metodi e Modelli per l'Ottimizzazione Combinatoria, anno accademico 14/15. L'esercitazione consiste nella risoluzione del  Traveling Salesman Problem (TSP) con l'uso di metodi di ottimizzazione. E' stato implementato un modello per il risolutore esatto \textsc{cplex}, e una metaeuristica di tipo particle swarm optimization \textsc{pso}. Il seguente documento e' strutturato come segue: in Sezione~\ref{sec:cplex} viene descritto il modello in \textsc{cplex} (relativo alla Parte 1), in Sezione~\ref{sec:eur} viene descritto come e' stato implementato \textsc{pso} (relativo alla Parte 2), in Sezione~\ref{sec:exp} vengono descritte le istanze del problema e la metodologia usate per l'esperimento, nonche' presentati i risultati. Il documento termina con alcune conclusioni in Sezione~\ref{sec:conclusioni}.
 
 \subsection{FILES CONSEGNATI} 
 \begin{itemize}
@@ -126,10 +126,8 @@ In questa sezione viene descritto in che modo e' stato realizzato il modello per
 %	RESULTS AND DISCUSSION
 %----------------------------------------------------------------------------------------
 
-\section{Metaeuristiche} \label{sec:eur}
-In questa sezione vengono descritte le metaeuristiche implementate per la risoluzione di TSP. 
-
-\subsection{Particle Swarm Optimization}
+\section{Particle Swarm Optimization} \label{sec:eur}
+In questa sezione vengono descritte come e' stato implementato \textsc{pso} per la risoluzione di TSP. 
 
 \textsc{pso} e' una metaeuristica basata su popolazione. In esso, gli individui $x_k$ (possibili soluzioni) si muovono nello spazio N-dimensionale secondo le loro rispettive velocita' $v_k$. In \textsc{pso} gli individui ricordano la miglior posizione da loro visitata, e la miglior posizione globale visitata dalla popolazione. Tali posizioni influiscono sulla velocita' dell'iterazione successiva. 
 
@@ -230,9 +228,9 @@ In Figura \ref{fig:quattro} e' riportato il miglioramento della miglior soluzion
 
 \section{Conclusioni}\label{sec:conclusioni}
 
-Durante l'implementazione di questa versione di \textsc{pso} ho avuto modo di notare alcuni difetti. Infatti sono dell'opinione che in questo schema manchi una componente che permetta di esplorare la \textit{neighborhood} senza necessariamente muoversi verso una delle soluzioni gia' visitate. Infatti con tale mancanza, una volta generate gli individui iniziali, tutte le modifiche alle velocita' ``muovono'' gli individui verso uno degli altri, e non c'e alcuna garanzia che l'ottimo stia in queste direzioni. Infatti i risultati mostrano che \textsc{pso} non riesce a performare in maniera discreta oltre i 20 nodi, commettendo errori notevoli.
+Durante l'implementazione di questa versione di \textsc{pso} ho avuto modo di notare alcuni difetti. Infatti sono dell'opinione che in questo schema manchi una componente che permetta di esplorare la \textit{neighborhood} senza necessariamente muoversi verso una delle soluzioni gia' visitate. Infatti con tale mancanza, una volta generate gli individui iniziali, tutte le modifiche alle velocita' ``muovono'' gli individui verso uno degli altri, e non c'e alcuna garanzia che l'ottimo stia in queste direzioni. Infatti i risultati mostrano che \textsc{pso} non riesce a performare in maniera discreta oltre i 20 nodi, commettendo errori notevoli. Un miglioramento per tale metodo potrebbe essere quello di introdurre una componente nella formula di update delle velocita' che permetta di esplorare la \textit{neighborhood} in direzioni promettenti (e.g.: greedy sub tour mutation (GSTM),  Albayrak~\cite{albayrak2011development}). 
  
-Nonostante cio', ho potuto vedere che \textsc{pso} e' molto piu' veloce di un metodo esatto quale \textsc{cplex}. In particolare, con l'aggiunta di un criterio di terminazione (e.g.: terminare l'ottimizzazione se la miglior soluzione trovata non migliora per $50$ iterazioni), la metaeuristica terminerebbe rapidamente per dimensionalita' basse, con risultati discreti. Infatti \textsc{cplex} diventa estremamente lento al crescere del numero dei nodi, il che lo rende inutilizzabili in contesti reali.
+Nonostante cio', ho potuto vedere che \textsc{pso} e' piu' veloce di un metodo esatto quale \textsc{cplex}. In particolare, con l'aggiunta di un criterio di terminazione (e.g.: terminare l'ottimizzazione se la miglior soluzione trovata non migliora per $50$ iterazioni), la metaeuristica terminerebbe rapidamente per dimensionalita' basse, con risultati discreti. Infatti \textsc{cplex} diventa lento al crescere del numero dei nodi, il che lo rende difficilmente applicabile a problemi molto grandi.
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
